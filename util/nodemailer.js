@@ -23,7 +23,6 @@ const sendMail = async (data) => {
         }</p>
       `,
     });
-<<<<<<< HEAD
 
     await resend.emails.send({
       from: 'Portfolio Team <onboarding@resend.dev>',
@@ -39,22 +38,6 @@ const sendMail = async (data) => {
     console.log(' Emails sent successfully');
   } catch (error) {
     console.error(' Email sending failed:', error);
-    
-    await resend.emails.send({
-      from: 'Portfolio Team <onboarding@resend.dev>',
-      to: data.email,
-      subject: 'Thank you for contacting us!',
-      html: `
-        <p>Hi ${data.name},</p>
-        <p>We have received your message and will contact you soon.</p>
-        <p>Regards,<br/>Ramkumar’s Portfolio</p>
-      `,
-    });
-
-    console.log('Emails sent successfully');
-  } catch (error) {
-    console.error('Email sending failed:', error);
->>>>>>> 5c7ffcada686a96e97a8ce28630894c860dda4a9
     throw new Error('Email sending failed');
   }
 };
