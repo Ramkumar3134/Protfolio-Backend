@@ -3,7 +3,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendMail = async (data) => {
   try {
-    // 1️⃣ Mail to Admin (You)
     await resend.emails.send({
       from: 'Portfolio Contact <onboarding@resend.dev>',
       to: 'lramkumar3134@gmail.com',
@@ -24,8 +23,7 @@ const sendMail = async (data) => {
         }</p>
       `,
     });
-
-    // 2️⃣ Auto-Reply Mail to User
+    
     await resend.emails.send({
       from: 'Portfolio Team <onboarding@resend.dev>',
       to: data.email,
@@ -37,7 +35,7 @@ const sendMail = async (data) => {
       `,
     });
 
-    console.log('✅ Emails sent successfully');
+    console.log('Emails sent successfully');
   } catch (error) {
     console.error('❌ Email sending failed:', error);
     throw new Error('Email sending failed');
