@@ -39,7 +39,6 @@ const sendMail = async (data) => {
     console.log(' Emails sent successfully');
   } catch (error) {
     console.error(' Email sending failed:', error);
-=======
     
     await resend.emails.send({
       from: 'Portfolio Team <onboarding@resend.dev>',
