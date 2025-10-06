@@ -39,6 +39,7 @@ const sendMail = async (data) => {
     });
 
   } catch (error) {
+    console.error("Nodemailer Error Details:", error);
     throw new Error("Email sending failed");
   }
 };
