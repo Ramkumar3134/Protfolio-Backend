@@ -1,11 +1,18 @@
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require("nodemailer");
 
 const sendMail = async (data) => {
   try {
-    await resend.emails.send({
-      from: 'Portfolio Contact <onboarding@resend.dev>',
-      to: 'lramkumar3134@gmail.com',
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+      to: "lramkumar3134@gmail.com",
       subject: `New Contact Form Submission from ${data.name}`,
       html: `
         <h3>New Contact Request</h3>
@@ -16,18 +23,14 @@ const sendMail = async (data) => {
         <p><strong>Company Stage:</strong> ${data.companyStage || 'N/A'}</p>
         <p><strong>Deadline:</strong> ${data.deadline || 'N/A'}</p>
         <p><strong>Budget:</strong> ${data.budget || 'N/A'}</p>
-        <p><strong>How Heard:</strong> ${
-          Array.isArray(data.howHeard)
-            ? data.howHeard.join(', ')
-            : data.howHeard || 'N/A'
-        }</p>
+        <p><strong>How Heard:</strong> ${Array.isArray(data.howHeard) ? data.howHeard.join(', ') : data.howHeard || 'N/A'}</p>
       `,
     });
 
-    await resend.emails.send({
-      from: 'Portfolio Team <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"Portfolio Team" <${process.env.EMAIL_USER}>`,
       to: data.email,
-      subject: 'Thank you for contacting us!',
+      subject: "Thank you for contacting us!",
       html: `
         <p>Hi ${data.name},</p>
         <p>We have received your message and will contact you soon.</p>
@@ -35,10 +38,8 @@ const sendMail = async (data) => {
       `,
     });
 
-    console.log(' Emails sent successfully');
   } catch (error) {
-    console.error(' Email sending failed:', error);
-    throw new Error('Email sending failed');
+    throw new Error("Email sending failed");
   }
 };
 
