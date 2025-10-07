@@ -8,8 +8,13 @@ const sendMail = async (data) => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      // Fix for 'self-signed certificate in certificate chain'
+      tls: {
+        rejectUnauthorized: false 
+      }
     });
 
+    // 1. Email to you (This will now succeed)
     await transporter.sendMail({
       from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
       to: "lramkumar3134@gmail.com",
@@ -27,8 +32,9 @@ const sendMail = async (data) => {
       `,
     });
 
+    // 2. Thank you email to the user (This will now execute)
     await transporter.sendMail({
-      from: `"Portfolio Team" <${process.env.EMAIL_USER}>`,
+      from: `"Ramkumar Portfolio" <${process.env.EMAIL_USER}>`,
       to: data.email,
       subject: "Thank you for contacting us!",
       html: `
