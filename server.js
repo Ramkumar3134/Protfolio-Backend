@@ -10,7 +10,10 @@ Connection();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: "https://portfolio-frontend-34i4.onrender.com",
+  origin: [
+    "https://portfolio-frontend-34i4.onrender.com",
+    "http://localhost:3134"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
