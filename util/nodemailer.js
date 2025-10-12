@@ -2,8 +2,19 @@ const nodemailer = require("nodemailer");
 
 const sendMail = async (data) => {
     try {
-        console.log("Setting up email transporter...");
+        console.log("=== EMAIL DEBUGGING START ===");
+        console.log("1. Checking environment variables...");
+        console.log("EMAIL_USER exists:", !!process.env.EMAIL_USER);
+        console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
         
+        if (process.env.EMAIL_USER) {
+            console.log("EMAIL_USER:", process.env.EMAIL_USER);
+        }
+        if (process.env.EMAIL_PASS) {
+            console.log("EMAIL_PASS length:", process.env.EMAIL_PASS.length);
+        }
+
+        console.log("2. Creating transporter...");
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
@@ -12,16 +23,15 @@ const sendMail = async (data) => {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            tls: {
-                rejectUnauthorized: false
-            }
+            debug: true, // Enable debug output
+            logger: true, // Enable logger
         });
 
-        // Verify transporter
+        console.log("3. Verifying transporter...");
         await transporter.verify();
-        console.log("SMTP configured successfully");
+        console.log("✅ Transporter verified successfully");
 
-        // Email to admin
+        console.log("4. Preparing admin email...");
         const adminMail = {
             from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
             to: "lramkumar3134@gmail.com",
@@ -39,11 +49,16 @@ const sendMail = async (data) => {
                         <p><strong>Budget:</strong> ${data.budget || 'Not provided'}</p>
                         <p><strong>How Heard:</strong> ${Array.isArray(data.howHeard) ? data.howHeard.join(', ') : data.howHeard || 'Not provided'}</p>
                     </div>
+                    <p><em>This email was sent from your portfolio contact form.</em></p>
                 </div>
             `,
         };
 
-        // Email to user
+        console.log("5. Sending admin email...");
+        const adminResult = await transporter.sendMail(adminMail);
+        console.log("✅ Admin email sent:", adminResult.messageId);
+
+        console.log("6. Preparing user confirmation email...");
         const userMail = {
             from: `"Ramkumar Portfolio" <${process.env.EMAIL_USER}>`,
             to: data.email,
@@ -61,17 +76,27 @@ const sendMail = async (data) => {
             `,
         };
 
-        // Send both emails
-        await transporter.sendMail(adminMail);
-        console.log("Admin notification sent");
+        console.log("7. Sending user confirmation email...");
+        const userResult = await transporter.sendMail(userMail);
+        console.log("✅ User confirmation email sent:", userResult.messageId);
 
-        await transporter.sendMail(userMail);
-        console.log("User confirmation sent");
-
+        console.log("=== EMAIL DEBUGGING COMPLETE ===");
         return true;
 
     } catch (error) {
-        console.error("Nodemailer Error:", error.message);
+        console.error("=== EMAIL ERROR ===");
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        console.error("Error code:", error.code);
+        console.error("Error command:", error.command);
+        
+        if (error.response) {
+            console.error("SMTP Response:", error.response);
+        }
+        
+        console.error("Full error:", error);
+        console.error("=== EMAIL ERROR END ===");
+        
         throw new Error(`Email sending failed: ${error.message}`);
     }
 };
