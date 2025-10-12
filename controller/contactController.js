@@ -1,18 +1,47 @@
-const contact = require('../model/contactmodel');
+const Contact = require('../model/contactmodel');
 const sendMail = require('../util/nodemailer');
 
-exports.createContect = async (req, res) => {
-  try {
-    const {name, email, brief, websiteUrl, companyStage, deadline, budget, howHeard}= req.body;
-    if (!name || !email) {
-      return res.status(400).json({message:"name and email required"})  
+exports.createContact = async (req, res) => {
+    try {
+        console.log("Received contact request:", req.body);
+        
+        const { name, email, brief, websiteUrl, companyStage, deadline, budget, howHeard } = req.body;
+
+        const contactData = new Contact({ 
+            name, 
+            email, 
+            brief, 
+            websiteUrl, 
+            companyStage, 
+            deadline, 
+            budget, 
+            howHeard 
+        });
+
+        const savedData = await contactData.save();
+        console.log("Data saved to database:", savedData._id);
+
+        // Send emails
+        try {
+            await sendMail(savedData);
+            console.log("Emails sent successfully");
+        } catch (emailError) {
+            console.error("Email sending failed:", emailError.message);
+            // Continue even if email fails
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: "Contact submitted successfully",
+            data: savedData
+        });
+
+    } catch (error) {
+        console.error("Controller Error:", error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Server Error',
+            error: error.message 
+        });
     }
-    const data = new contact({ name, email, brief, websiteUrl, companyStage, deadline, budget, howHeard });
-    const saveData = await data.save();
-    await sendMail(saveData);
-    return res.status(201).json({message:"contact send successfully",saveData});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({message:'Server Error'});
-  }
 };
